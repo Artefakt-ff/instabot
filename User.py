@@ -8,7 +8,7 @@ class User:
     MIN_TIME_TO_NEW_SUBSCRIPTIONS = 60 * 60
     TTL_OF_SUBSCRIPTION = 3 * 24 * 60 * 60 * 60
 
-    def __init__(self, login='89623160816', password='Artefaktgsdcom11'):
+    def __init__(self, login='', password=''):
         # TODO: Сделай проверку пути
         self.login = login
         self.password = password
