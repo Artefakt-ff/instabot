@@ -11,8 +11,9 @@ from User import me
 
 
 def write_subscribers_of_username_to_file(username, list_of_subscribers):
-    # TODO: Сделай проверку пути
-    with open('../users_subscribers/' + username + '.json', 'w', encoding='utf8') as fp:
+    if not os.path.exists('users_subscribers/'):
+        os.mkdir('users_subscribers/')
+    with open('users_subscribers/' + username + '.json', 'w', encoding='utf8') as fp:
         json.dump(list_of_subscribers, fp)
     return True
 
@@ -80,10 +81,10 @@ class BaseProcessor:
 
     def scroll_down_for_subscribers(self, number_of_subscribers_to_scroll):
         time.sleep(1)
-        element = 'document.querySelectorAll(\'div[role="dialog"]\')[0].children[1]'  # TODO: подумай как обращаться не по классу
+        element = 'document.querySelectorAll(\'div[role="dialog"]\')[0].children[2]'  # TODO: подумай как обращаться не по классу
         height_of_subscriber_block = 54
         total_scroll = number_of_subscribers_to_scroll * height_of_subscriber_block
-        number_of_scrollings = total_scroll // 500 + 1
+        number_of_scrollings = total_scroll // 500 + 5
 
         self.browser.execute_script('scroll_element = {};'.format(element))
         for i in range(number_of_scrollings):
@@ -101,8 +102,10 @@ class BaseProcessor:
             if self.__do_i_need_to_follow_this_user(username):
                 self.logger.log('Have not already followed this user.')
                 try:
+                    time.sleep(0.3)
                     follow_button = self.browser.find_element_by_tag_name('button')
                     follow_button.click()
+                    time.sleep(0.3)
                     self.db.follows_increment()
                     me.add_subscribed_username(username)
                     self.logger.log('Subscribed on {}.'.format(username))
@@ -136,7 +139,7 @@ class BaseProcessor:
         :return: bool
         """
         counters = self.db.get_follow_limits_by_account()
-        return counters['daily'] < 1001 and counters['hourly'] < 76
+        return counters['daily'] < 1001 and counters['hourly'] < 400
 
     def __do_i_need_to_follow_this_user(self, username) -> bool:
         """
@@ -183,7 +186,7 @@ class BaseProcessor:
         self.auto_follow = flag
         return self
 
-    def get_list_of_subscribers(self, username):  #  Пишет в файл всех подписчиков в файл
+    def get_list_of_subscribers(self, username):  # Пишет в файл всех подписчиков в файл
         self.logger.log("Getting list {}s\' subscribers.".format(username))
         try:
             ready_subscribers = []
@@ -214,4 +217,33 @@ class BaseProcessor:
         except excp.NoSuchElementException:
             self.logger.log('Can\'t find link to followers.')
 
+    def get_list_of_subscribed(self, username):  # Пишет в файл все подписки в файл
+        self.logger.log("Getting list {}s\' subscribers.".format(username))
+        try:
+            ready_subscribers = []
+            subscribers_button = self.browser.find_element_by_partial_link_text(
+                'одписки')  # click on button for getting subscribers
+            number_of_subscribers = int(subscribers_button.text.split()[1])
+            subscribers_button.click()
 
+            self.scroll_down_for_subscribers(number_of_subscribers_to_scroll=number_of_subscribers)
+
+            list_of_subscribers = self.browser.find_elements(By.CSS_SELECTOR, 'a[title]')
+            for i in range(len(list_of_subscribers)):
+                try:
+                    list_of_subscribers[i] = list_of_subscribers[i].text
+                except UnicodeEncodeError:
+                    pass
+
+            current_subscribers = me.get_subscribers(format_of_return='list')
+
+            for subscriber in list_of_subscribers:
+                if subscriber not in current_subscribers:
+                    ready_subscribers.append(subscriber)
+
+            self.logger.log('Got list of subscribers in number of {}.'.format(len(list_of_subscribers)))
+            write_subscribers_of_username_to_file(username, list_of_subscribers)
+            self.logger.log('Wrote to file {}.json'.format(username))
+
+        except excp.NoSuchElementException:
+            self.logger.log('Can\'t find link to followers.')

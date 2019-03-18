@@ -7,6 +7,9 @@ import os
 class Logger:
     def __init__(self, log_path=tempfile.gettempdir(), debug=False):
         self.log_file = os.path.join(log_path, 'insta_browser_{}.log'.format(__version__))
+        if not os.path.exists(self.log_file):
+            with open(self.log_file, 'w'):
+                pass
         self.screen_shot_path = os.path.join(log_path, 'screenshot')
         self.debug = debug
 

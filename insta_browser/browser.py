@@ -1,6 +1,6 @@
 # -*- coding: utf-8 -*-
 import json
-
+import os
 from selenium import webdriver
 
 from User import me
@@ -25,7 +25,7 @@ class Browser:
         options = webdriver.ChromeOptions()
         options.add_argument('headless')
         options.add_argument('--window-size=900,768')
-        self.browser = webdriver.Chrome('chromedriver.exe')
+        self.browser = webdriver.Chrome('/opt/chromedriver/chromedriver')
         self.browser.implicitly_wait(10)
 
         self.cookie_path = cookie_path
@@ -58,8 +58,6 @@ class Browser:
         self.browser.quit()
         self.logger.log(u'Browser process was ended')
         self.logger.log(u'')
-
-
 
     def get_summary(self):
         log = 'Feed scrolled down {scrolled} times, liked {liked} posts, skipped {skipped} posts,' \
@@ -132,17 +130,25 @@ class Browser:
         processor.get_list_of_subscribers(username)
         self.summary = processor.get_summary()
 
+    def get_subscribed_of_username(self, username):
+        br = self.browser
+        self.get("https://www.instagram.com/{}".format(username))
+        self.logger.log("Check list of subscribers of {}.".format(username))
+        processor = BaseProcessor(db=self.db, br=br, lg=self.logger)
+        processor.get_list_of_subscribed(username)
+        self.summary = processor.get_summary()
+
     def subscribe_on_new_users(self, username, count):
         br = self.browser
         self.logger.log("Check list of subscribers of {}.".format(username))
         self.get_subscribers_of_username(username)
-        with open('../users_subscribers/'+username+'.json', 'r', encoding='utf8', errors='ignore') as fp:
+        with open('../users_subscribers/' + username + '.json', 'r', encoding='utf8', errors='ignore') as fp:
             list_of_future_subscribers = json.load(fp)
         length_list_of_subscribers = len(list_of_future_subscribers)
 
         for i in range(count):
             try:
-                self.subscribe_username(list_of_future_subscribers[length_list_of_subscribers-i])
+                self.subscribe_username(list_of_future_subscribers[length_list_of_subscribers - i])
                 list_of_future_subscribers.pop()
                 me.add_subscribed_username(username)
             except Exception as e:
@@ -150,5 +156,3 @@ class Browser:
 
         with open('..users_subscribers/' + username + '.json', 'w', encoding='utf8', errors='ignore') as fp:
             json.dump(list_of_future_subscribers, fp)
-
-

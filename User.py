@@ -1,22 +1,35 @@
 import json
+import os
 import time
 from json import JSONDecodeError
 
 
 class User:
-    MAX_SUBSCRIBE_LIMIT = 59
+    MAX_SUBSCRIBE_LIMIT = 86
     MIN_TIME_TO_NEW_SUBSCRIPTIONS = 60 * 60
     TTL_OF_SUBSCRIPTION = 3 * 24 * 60 * 60 * 60
 
-    def __init__(self, login='', password=''):
-        # TODO: Сделай проверку пути
+    def __init__(self, login='_maestrik_', password='PochTa1998'):
         self.login = login
         self.password = password
-        self.dict_of_subscribers_file = '../user_data/' + login + '_subscribers.json'
-        self.configuration_file = '../user_data/' + login + '_configuration.json'
+        self.create_directories()
+        self.dict_of_subscribers_file = 'user_data/' + login + '_subscribers.json'
+        self.configuration_file = 'user_data/' + login + '_configuration.json'
 
     def __str__(self):
         return self.login
+
+    def create_directories(self):
+        temp_path_config = 'user_data/{}_configuration.json'.format(self.login)
+        temp_path_subscribers = 'user_data/{}_subscribers.json'.format(self.login)
+        if not os.path.exists('user_data/'):
+            os.mkdir('user_data/')
+        if not os.path.exists(temp_path_config):
+            with open(temp_path_config, 'w') as f:
+                f.write('{"useful_usernames": [], "time_of_last_subscription": 0}')
+        if not os.path.exists(temp_path_subscribers):
+            with open(temp_path_subscribers, 'w') as f:
+                f.write('{}')
 
     def get_login(self):
         return self.login
@@ -90,7 +103,7 @@ class User:
             dict_of_configuration = json.load(fp)
         dict_of_configuration['useful_usernames'].extend(list(
             set(data).difference(
-                set(dict_of_configuration['useful_usernames'])))) # finding usernames that don't repeating
+                set(dict_of_configuration['useful_usernames']))))  # finding usernames that don't repeating
         with open(self.configuration_file, 'w', encoding='utf8', errors='ignore') as fp:
             json.dump(dict_of_configuration, fp)
 

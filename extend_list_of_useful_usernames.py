@@ -16,7 +16,7 @@ try:
     with open(file, 'r', encoding='utf8', errors='ignore') as fp:
         lines = fp.readlines()
     used_users = [line for line in lines if line[0] == '#']
-    formatted_users = [line.strip() for line in lines if line[0] != '#']
+    formatted_users = [line.strip() for line in lines if line[0] not in ['#', '', '\n']]
     if formatted_users:
         print("Found {} users.".format(len(formatted_users)))
         me.extend_list_of_useful_usernames(formatted_users)
@@ -28,6 +28,4 @@ try:
     else:
         print("No new users for adding.")
 except FileNotFoundError:
-    print('Wrong path to file.')
-
-input()
+    print('Wrong path to file. Path {}'.format(args.file or 'new_useful_users.txt'))

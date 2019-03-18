@@ -17,6 +17,12 @@ def auth_with_cookies(browser, logger, login, cookie_path=tempfile.gettempdir())
     :return:
     """
     logger.save_screen_shot(browser, 'login.png')
+    if not os.path.exists(cookie_path + login + '.pkl'):
+        with open(cookie_path + login + '.pkl', 'w'):
+            pass
+        logger.log("No cookies file yet.")
+        logger.log("Unsuccessful authorization with cookies.")
+        return False
     try:
         logger.log('Trying to auth with cookies.')
         cookies = pickle.load(open(os.path.join(cookie_path, login + '.pkl'), "rb"))
@@ -26,9 +32,8 @@ def auth_with_cookies(browser, logger, login, cookie_path=tempfile.gettempdir())
         if check_if_user_authenticated(browser):
             logger.log("Successful authorization with cookies.")
             return True
-    except:
-        pass
-
+    except pickle.PickleError:
+        logger.log("Something wrong with cookies. Edit them manual.")
     logger.log("Unsuccessful authorization with cookies.")
     return False
 

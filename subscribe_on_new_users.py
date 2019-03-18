@@ -25,7 +25,7 @@ if me.can_subscribe_on_new_user():
         for useful_username in list_of_useful_usernames:
             is_file_ended = True
 
-            with open('../users_subscribers/' + useful_username + '.json', 'r', encoding='utf8', errors='ignore') as fp:
+            with open('users_subscribers/' + useful_username + '.json', 'r', encoding='utf8', errors='ignore') as fp:
                 list_of_username_subscriptions = json.load(fp)
             length_of_list = len(list_of_username_subscriptions)
             if length_of_list:
@@ -46,7 +46,6 @@ if me.can_subscribe_on_new_user():
 
             if i == count:
                 break
-            print(list_of_future_subscribers)
         if list_of_future_subscribers:
             br = browser.Browser(
                 debug=debug,
