@@ -64,7 +64,5 @@ pip-selfcheck.json
 .idea/
 /var/*
 vr/
-!var/cookie/.gitkeep
 !var/log/screenshot/.gitkeep
-!var/log/.gitkeep
 !var/exclude_accounts.txt
