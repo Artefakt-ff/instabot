@@ -9,7 +9,7 @@ class User:
     MIN_TIME_TO_NEW_SUBSCRIPTIONS = 60 * 60
     TTL_OF_SUBSCRIPTION = 3 * 24 * 60 * 60 * 60
 
-    def __init__(self, login='_maestrik_', password='PochTa1998'):
+    def __init__(self, login='', password=''):
         self.login = login
         self.password = password
         self.create_directories()
