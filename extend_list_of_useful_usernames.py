@@ -9,7 +9,7 @@ parser.add_argument('--debug', help='enable debug mode', action="store_true")
 parser.add_argument('--file', help='path to specific file with new useful_users', type=str)
 args = parser.parse_args()
 debug = args.debug
-file = args.file or "new_useful_users.txt"
+file = args.file or "user_data/new_useful_users.txt"
 
 
 try:

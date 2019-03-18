@@ -18,8 +18,6 @@ def auth_with_cookies(browser, logger, login, cookie_path=tempfile.gettempdir())
     """
     logger.save_screen_shot(browser, 'login.png')
     if not os.path.exists(cookie_path + login + '.pkl'):
-        with open(cookie_path + login + '.pkl', 'w'):
-            pass
         logger.log("No cookies file yet.")
         logger.log("Unsuccessful authorization with cookies.")
         return False

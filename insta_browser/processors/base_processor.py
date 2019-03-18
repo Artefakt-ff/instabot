@@ -81,7 +81,19 @@ class BaseProcessor:
 
     def scroll_down_for_subscribers(self, number_of_subscribers_to_scroll):
         time.sleep(1)
-        element = 'document.querySelectorAll(\'div[role="dialog"]\')[0].children[2]'  # TODO: подумай как обращаться не по классу
+        element = 'document.querySelectorAll(\'div[role="dialog"]\')[0].children[1]'
+        height_of_subscriber_block = 54
+        total_scroll = number_of_subscribers_to_scroll * height_of_subscriber_block
+        number_of_scrollings = total_scroll // 500 + 5
+
+        self.browser.execute_script('scroll_element = {};'.format(element))
+        for i in range(number_of_scrollings):
+            time.sleep(1)
+            self.browser.execute_script('scroll_element.scrollTop = scroll_element.scrollTop + 500;')
+
+    def scroll_down_for_subscribed(self, number_of_subscribers_to_scroll):
+        time.sleep(1)
+        element = 'document.querySelectorAll(\'div[role="dialog"]\')[0].children[2]'
         height_of_subscriber_block = 54
         total_scroll = number_of_subscribers_to_scroll * height_of_subscriber_block
         number_of_scrollings = total_scroll // 500 + 5
@@ -226,7 +238,7 @@ class BaseProcessor:
             number_of_subscribers = int(subscribers_button.text.split()[1])
             subscribers_button.click()
 
-            self.scroll_down_for_subscribers(number_of_subscribers_to_scroll=number_of_subscribers)
+            self.scroll_down_for_subscribed(number_of_subscribers_to_scroll=number_of_subscribers)
 
             list_of_subscribers = self.browser.find_elements(By.CSS_SELECTOR, 'a[title]')
             for i in range(len(list_of_subscribers)):

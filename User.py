@@ -9,15 +9,29 @@ class User:
     MIN_TIME_TO_NEW_SUBSCRIPTIONS = 60 * 60
     TTL_OF_SUBSCRIPTION = 3 * 24 * 60 * 60 * 60
 
-    def __init__(self, login='', password=''):
-        self.login = login
-        self.password = password
+    def __init__(self):
+        self.login, self.password = self.get_login_and_password()
         self.create_directories()
-        self.dict_of_subscribers_file = 'user_data/' + login + '_subscribers.json'
-        self.configuration_file = 'user_data/' + login + '_configuration.json'
+        self.dict_of_subscribers_file = 'user_data/' + self.login + '_subscribers.json'
+        self.configuration_file = 'user_data/' + self.login + '_configuration.json'
 
     def __str__(self):
         return self.login
+
+    @staticmethod
+    def get_login_and_password():
+        try:
+            with open('user_data/credentials.txt', 'r') as f:
+                lines = f.readlines()
+            login = lines[0].split()[1]
+            password = lines[1].split()[1]
+            return login, password
+        except FileNotFoundError:
+            print('Cannot find file user_data/credentials.txt. Have you moved it or deleted?')
+            exit(1)
+        except IndexError:
+            print('Cannot read login or/and password. Check the user_data/credentials.txt')
+            exit(1)
 
     def create_directories(self):
         temp_path_config = 'user_data/{}_configuration.json'.format(self.login)
